@@ -1,0 +1,35 @@
+# Testing dependencies for Ultra-Turbo AppData Cleaner
+
+# Core testing framework
+pytest==7.4.2
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-mock==3.11.1
+
+# Web testing
+pytest-flask==1.2.0
+flask-testing==0.8.1
+
+# Browser automation testing
+playwright==1.39.0
+pytest-playwright==0.4.3
+
+# Performance testing
+pytest-benchmark==4.0.0
+
+# Test data generation
+faker==19.6.2
+
+# Mocking and fixtures
+responses==0.23.3
+freezegun==1.2.2
+
+# Coverage reporting
+coverage==7.3.2
+pytest-html==4.0.2
+
+# Parallel test execution
+pytest-xdist==3.3.1
+
+# Memory profiling for tests
+memory-profiler==0.61.0
