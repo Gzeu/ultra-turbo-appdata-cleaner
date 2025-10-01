@@ -1,0 +1,380 @@
+{% extends "base.html" %}
+
+{% block title %}Logs - Ultra-Turbo AppData Cleaner{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="bi bi-journal-text"></i>
+            System Logs
+            <small class="text-muted fs-6">Real-time application logs</small>
+        </h1>
+    </div>
+</div>
+
+<!-- Log Controls -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-sliders"></i>
+                    Log Controls
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="log-level" class="form-label">Log Level</label>
+                        <select class="form-select" id="log-level" onchange="filterLogs()">
+                            <option value="all">All Levels</option>
+                            <option value="debug">Debug</option>
+                            <option value="info">Info</option>
+                            <option value="warning">Warning</option>
+                            <option value="error">Error</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="log-source" class="form-label">Source</label>
+                        <select class="form-select" id="log-source" onchange="filterLogs()">
+                            <option value="all">All Sources</option>
+                            <option value="core">Core</option>
+                            <option value="modules">Modules</option>
+                            <option value="web">Web Interface</option>
+                            <option value="api">API</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="log-search" class="form-label">Search</label>
+                        <input type="text" class="form-control" id="log-search" 
+                               placeholder="Search log messages..." onkeyup="filterLogs()">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-outline-primary" onclick="refreshLogs()" title="Refresh">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="clearLogs()" title="Clear">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="auto-scroll" checked title="Auto-scroll">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log Display -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-ul"></i>
+                    Application Logs
+                    <span class="badge bg-secondary ms-2" id="log-count">0</span>
+                </h5>
+                <div>
+                    <button class="btn btn-outline-success btn-sm" onclick="exportLogs()">
+                        <i class="bi bi-download"></i> Export
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div id="log-container" class="log-container">
+                    <div class="text-muted text-center py-4">
+                        <i class="bi bi-journal-text fs-1 mb-2 d-block"></i>
+                        Loading logs...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+.log-container {
+    height: 600px;
+    overflow-y: auto;
+    background-color: #1a1a1a;
+    color: #e9ecef;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.875rem;
+    padding: 1rem;
+}
+
+[data-bs-theme="light"] .log-container {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.log-entry {
+    margin-bottom: 0.25rem;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+[data-bs-theme="light"] .log-entry {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.log-timestamp {
+    color: #6c757d;
+    white-space: nowrap;
+    font-size: 0.8rem;
+}
+
+.log-level {
+    font-weight: bold;
+    min-width: 60px;
+    text-align: center;
+    padding: 0.125rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+}
+
+.log-level.debug { background-color: #6c757d; color: white; }
+.log-level.info { background-color: #0dcaf0; color: black; }
+.log-level.warning { background-color: #ffc107; color: black; }
+.log-level.error { background-color: #dc3545; color: white; }
+.log-level.critical { background-color: #dc3545; color: white; animation: pulse 1s infinite; }
+
+.log-source {
+    color: #ffc107;
+    font-weight: 500;
+    min-width: 80px;
+}
+
+.log-message {
+    flex-grow: 1;
+    word-break: break-word;
+}
+
+.log-entry.hidden {
+    display: none;
+}
+</style>
+
+<script>
+let logs = [];
+let filteredLogs = [];
+let autoScroll = true;
+let logRefreshInterval = null;
+
+// Initialize logs page
+function initializeLogs() {
+    console.log('📜 Initializing logs page...');
+    
+    // Load initial logs
+    loadLogs();
+    
+    // Setup auto-refresh
+    logRefreshInterval = setInterval(loadLogs, 5000);
+    
+    // Setup auto-scroll toggle
+    const autoScrollToggle = document.getElementById('auto-scroll');
+    if (autoScrollToggle) {
+        autoScrollToggle.addEventListener('change', function() {
+            autoScroll = this.checked;
+        });
+    }
+}
+
+// Load logs from server
+function loadLogs() {
+    // Simulate log loading - in real app, this would fetch from /api/logs
+    const simulatedLogs = generateSimulatedLogs();
+    
+    logs = simulatedLogs;
+    filteredLogs = [...logs];
+    
+    displayLogs();
+    updateLogCount();
+}
+
+// Generate simulated logs for demonstration
+function generateSimulatedLogs() {
+    const logLevels = ['debug', 'info', 'warning', 'error'];
+    const sources = ['core.cleaner', 'modules.appdata', 'web.api', 'core.scanner'];
+    const messages = [
+        'System scan completed successfully',
+        'Found 247 temporary files',
+        'AppData directory accessible',
+        'Backup created successfully', 
+        'Warning: High memory usage detected',
+        'Cleaning operation started',
+        'Error accessing protected directory',
+        'WebSocket connection established',
+        'Settings updated by user',
+        'Database connection initialized'
+    ];
+    
+    const logs = [];
+    const now = new Date();
+    
+    for (let i = 0; i < 50; i++) {
+        const timestamp = new Date(now.getTime() - (i * 60000)); // 1 minute intervals
+        logs.push({
+            timestamp: timestamp.toISOString(),
+            level: logLevels[Math.floor(Math.random() * logLevels.length)],
+            source: sources[Math.floor(Math.random() * sources.length)],
+            message: messages[Math.floor(Math.random() * messages.length)]
+        });
+    }
+    
+    return logs.reverse(); // Show newest first
+}
+
+// Display logs in container
+function displayLogs() {
+    const logContainer = document.getElementById('log-container');
+    if (!logContainer) return;
+    
+    if (filteredLogs.length === 0) {
+        logContainer.innerHTML = `
+            <div class="text-muted text-center py-4">
+                <i class="bi bi-journal-x fs-1 mb-2 d-block"></i>
+                No logs match current filters
+            </div>
+        `;
+        return;
+    }
+    
+    let logsHTML = '';
+    
+    filteredLogs.forEach((log, index) => {
+        const timestamp = new Date(log.timestamp).toLocaleTimeString();
+        
+        logsHTML += `
+            <div class="log-entry" data-level="${log.level}" data-source="${log.source}">
+                <span class="log-timestamp">${timestamp}</span>
+                <span class="log-level ${log.level}">${log.level.toUpperCase()}</span>
+                <span class="log-source">${log.source}</span>
+                <span class="log-message">${log.message}</span>
+            </div>
+        `;
+    });
+    
+    logContainer.innerHTML = logsHTML;
+    
+    // Auto-scroll to bottom if enabled
+    if (autoScroll) {
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+}
+
+// Filter logs based on current filter settings
+function filterLogs() {
+    const levelFilter = document.getElementById('log-level').value;
+    const sourceFilter = document.getElementById('log-source').value;
+    const searchFilter = document.getElementById('log-search').value.toLowerCase();
+    
+    filteredLogs = logs.filter(log => {
+        // Level filter
+        if (levelFilter !== 'all' && log.level !== levelFilter) {
+            return false;
+        }
+        
+        // Source filter
+        if (sourceFilter !== 'all' && !log.source.includes(sourceFilter)) {
+            return false;
+        }
+        
+        // Search filter
+        if (searchFilter && !log.message.toLowerCase().includes(searchFilter)) {
+            return false;
+        }
+        
+        return true;
+    });
+    
+    displayLogs();
+    updateLogCount();
+}
+
+// Update log count display
+function updateLogCount() {
+    const countElement = document.getElementById('log-count');
+    if (countElement) {
+        countElement.textContent = filteredLogs.length;
+    }
+}
+
+// Refresh logs
+function refreshLogs() {
+    console.log('🔄 Refreshing logs...');
+    loadLogs();
+    showNotification('Logs refreshed', 'info', 2000);
+}
+
+// Clear log display (not actual logs)
+function clearLogs() {
+    if (confirm('Clear log display? (This only clears the display, not actual log files)')) {
+        logs = [];
+        filteredLogs = [];
+        displayLogs();
+        updateLogCount();
+        showNotification('Log display cleared', 'info', 2000);
+    }
+}
+
+// Export logs
+function exportLogs() {
+    const logData = filteredLogs.map(log => 
+        `${log.timestamp} [${log.level.toUpperCase()}] ${log.source}: ${log.message}`
+    ).join('\n');
+    
+    const blob = new Blob([logData], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `utac_logs_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    URL.revokeObjectURL(url);
+    
+    showNotification('Logs exported successfully', 'success', 3000);
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeLogs();
+});
+
+// Handle WebSocket log events
+window.addEventListener('utac-log-entry', function(event) {
+    const logEntry = event.detail;
+    logs.unshift(logEntry); // Add to beginning
+    
+    // Limit log history
+    if (logs.length > 1000) {
+        logs = logs.slice(0, 1000);
+    }
+    
+    // Re-filter and display
+    filterLogs();
+});
+
+// Cleanup interval when leaving page
+window.addEventListener('beforeunload', function() {
+    if (logRefreshInterval) {
+        clearInterval(logRefreshInterval);
+    }
+});
+</script>
+{% endblock %}
