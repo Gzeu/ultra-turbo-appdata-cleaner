@@ -4,10 +4,12 @@
 
 O soluție completă pentru curățarea eficientă a fișierelor temporare, cache-ului browserelor, log-urilor vechi și a directorului AppData cu focus pe siguranța sistemului.
 
+![Status](https://img.shields.io/badge/Status-Functional-brightgreen) ![Python](https://img.shields.io/badge/Python-3.8+-blue) ![Web](https://img.shields.io/badge/Web%20Interface-Ready-success) ![License](https://img.shields.io/badge/License-MIT-green)
+
 ## 🌟 Features Principale
 
 ### 🔍 **Scanare Inteligentă**
-- **Scanare asincronă** pentru performanță optimală
+- **Scanare asincronă** pentru performanță optimă
 - **Detecție automată** de fișiere temporare și cache
 - **Analiză de siguranță** pe 5 niveluri (Very Safe → Dangerous)
 - **Pattern matching** pentru aplicații specifice (Chrome, Firefox, Discord, VS Code)
@@ -24,10 +26,12 @@ O soluție completă pentru curățarea eficientă a fișierelor temporare, cach
 - **File-in-use** verification
 - **System restore point** creation
 
-### 📊 **3 Interfețe Complete**
-1. **🌐 Web Interface** - Dashboard modern cu real-time updates
-2. **🖥️ GUI Interface** - Desktop app cu tkinter
-3. **💻 CLI Interface** - Command line pentru automation
+### 🌐 **Interfață Web Modernă**
+- **Dashboard interactiv** cu real-time updates
+- **Control panel avansat** pentru operațiuni
+- **Settings manager** complet
+- **Live logs** cu filtering
+- **Mobile responsive** design
 
 ## 📱 Instalare și Utilizare
 
@@ -46,16 +50,17 @@ git clone https://github.com/Gzeu/ultra-turbo-appdata-cleaner.git
 cd ultra-turbo-appdata-cleaner
 
 # 2. Install core dependencies
-pip install psutil pathlib logging
+pip install psutil pathlib
 
-# 3. Pentru Web Interface
+# 3. Pentru Web Interface (RECOMANDAT)
 cd web
 pip install -r requirements.txt
 
-# 4. Run aplicatia
-python main.py          # GUI mode (default)
-python main.py --cli    # CLI mode
-python web/app.py       # Web interface
+# 4. Run aplicația
+python app.py       # Web interface
+# SAU
+cd ..
+python main.py      # Console application
 ```
 
 ## 🌐 **Web Interface (Recomandat)**
@@ -64,109 +69,111 @@ python web/app.py       # Web interface
 ```bash
 cd web
 python app.py
-# Access: http://localhost:5000
+# Acces: http://localhost:5000
 ```
 
-### **Features Web:**
-- **📊 Dashboard** cu system overview și real-time charts
-- **🎯 Control Panel** pentru operațiuni de curățare
-- **⚙️ Settings Manager** pentru configurări avansate
-- **📜 Live Logs** cu filtering și export
-- **📱 Mobile-friendly** responsive design
-- **🌙 Dark/Light Theme** toggle
-- **⚡ WebSocket** pentru updates în timp real
+### **🎯 Dashboard Features:**
+- **📊 System Overview** - Disk, Memory, CPU usage în timp real
+- **📈 Interactive Charts** - Storage breakdown cu Chart.js
+- **⚡ Quick Actions** - Scan și clean cu un click
+- **📋 Activity Feed** - Monitor operațiuni în timp real
+- **📱 Mobile Support** - Responsive pe toate dispozitivele
 
-### **API REST Endpoints:**
-```
-GET  /api/system/info           # System information
-POST /api/scan/quick            # Quick scan
-POST /api/scan/full             # Full system scan
-POST /api/clean/selected        # Clean selected files
-GET  /api/progress/{operation}  # Operation progress
-GET  /api/settings              # Get settings
-POST /api/settings              # Update settings
-```
+### **🎛️ Control Panel:**
+- **🔍 Multiple Scan Types** - Quick, Full, AppData, Temp, Duplicates
+- **📄 File Browser** cu checkbox selection
+- **🎨 Safety Indicators** - Color coding pentru siguranță
+- **🔧 Advanced Filters** - Categorie, siguranță, search
+- **⚖️ Batch Operations** - Selecție și curățare multiplă
 
-## 💻 **CLI Interface**
+### **⚙️ Settings Manager:**
+- **📂 Scan Paths** configuration
+- **🛡️ Safety & Backup** settings
+- **🎨 Theme Selection** - Dark/Light mode
+- **🌍 Language Support** - Română/English
 
-### **Comenzi Principale:**
-```bash
-# Quick scan
-python main.py --cli --scan
-
-# Auto clean (cu backup)
-python main.py --cli --clean
-
-# Interactive mode
-python main.py --cli
-
-# Custom config
-python main.py --cli --config /path/to/config.json
-```
-
-### **CLI Features:**
-- **Batch operations** pentru automatizare
-- **JSON output** pentru integrare în scripturi
-- **Verbose logging** pentru debugging
-- **Scheduled cleaning** capabilities
-
-## 🖥️ **GUI Interface**
+## 🔌 **API REST Endpoints**
 
 ```bash
-# Default GUI mode
-python main.py
+# System Information
+GET  /api/system/info           # Informații sistem
+
+# Scan Operations
+POST /api/scan/quick            # Scanare rapidă
+POST /api/scan/full             # Scanare completă
+POST /api/scan/appdata          # Scanare AppData
+POST /api/scan/temp             # Scanare fișiere temp
+POST /api/scan/duplicates       # Detectare duplicate
+
+# Clean Operations
+POST /api/clean/selected        # Curățare fișiere selectate
+POST /api/clean/appdata         # Curățare AppData
+POST /api/clean/temp            # Curățare temp files
+
+# Progress & Settings
+GET  /api/progress/{operation}  # Status operațiune
+GET  /api/settings              # Obține setări
+POST /api/settings              # Actualizează setări
 ```
 
-### **GUI Features:**
-- **Modern tkinter interface** cu tabs
-- **File browser** pentru selecție manuală
-- **Real-time progress bars** animate
-- **Settings panel** avansat
-- **Preview înainte de ștergere**
-
-## 📬 **Structura Proiectului**
+## 🗂️ **Structura Proiectului**
 
 ```
 ultra-turbo-appdata-cleaner/
 ├── main.py                    # Entry point principal
-├── config/                   # Configurații aplicație
+├── config/                   # 📁 Configurații aplicație
 │   ├── __init__.py
 │   ├── settings.py           # Management settings
 │   ├── constants.py          # Constante aplicație
 │   └── logging_config.py     # Configurare logging
-├── core/                     # Engine principal
+├── core/                     # 🔧 Engine principal
+│   ├── __init__.py
 │   ├── cleaner.py            # Main cleaning engine
 │   ├── scanner.py            # File system scanning
 │   ├── analyzer.py           # File analysis & categorization
 │   ├── safety.py             # Safety checks
 │   └── progress.py           # Progress tracking
-├── modules/                  # Module specializate
+├── modules/                  # 🧩 Module specializate
+│   ├── __init__.py
 │   ├── appdata_cleaner.py    # Curățare AppData
 │   ├── temp_cleaner.py       # Curățare temp files
 │   ├── browser_cleaner.py    # Curățare cache browsere
 │   ├── duplicate_finder.py   # Detecție duplicate
 │   └── log_cleaner.py        # Curățare log-uri
-├── utils/                    # Utilități
+├── utils/                    # 🛠️ Utilități
+│   ├── __init__.py
 │   ├── file_operations.py    # Operațiuni fișiere
 │   ├── backup_manager.py     # Management backup
 │   └── formatters.py         # Formatare date
-├── web/                      # 🌐 Web Interface
-│   ├── app.py                # Flask application
-│   ├── config.py             # Web configuration
-│   ├── requirements.txt      # Web dependencies
-│   ├── api/                  # REST API
-│   │   ├── scanner.py
-│   │   ├── cleaner.py
-│   │   └── system.py
-│   ├── templates/            # HTML templates
-│   │   ├── base.html
-│   │   ├── dashboard.html
-│   │   ├── cleaner.html
-│   │   └── settings.html
-│   └── static/               # CSS și JavaScript
-│       ├── css/main.css
-│       └── js/
-└── tests/                    # Suite teste (TBD)
+└── web/                      # 🌐 **INTERFAȚA WEB COMPLETĂ**
+    ├── app.py                # Flask application
+    ├── config.py             # Web configuration
+    ├── requirements.txt      # Web dependencies
+    ├── websocket_handler.py  # Real-time communication
+    ├── api/                  # 🔌 REST API
+    │   ├── __init__.py
+    │   ├── scanner.py        # Scan operations API
+    │   ├── cleaner.py        # Clean operations API
+    │   └── system.py         # System info API
+    ├── templates/            # 📄 HTML Templates
+    │   ├── base.html         # Layout principal
+    │   ├── dashboard.html    # Dashboard interactiv
+    │   ├── cleaner.html      # Control panel
+    │   ├── settings.html     # Settings manager
+    │   └── logs.html         # Log viewer
+    ├── static/               # 📱 Frontend Assets
+    │   ├── css/
+    │   │   └── main.css      # Modern styling
+    │   └── js/
+    │       ├── main.js       # Core JavaScript
+    │       ├── websocket.js  # WebSocket communication
+    │       ├── dashboard.js  # Dashboard functions
+    │       └── cleaner.js    # Cleaner functionality
+    └── utils/                # 🔧 Web utilities
+        ├── __init__.py
+        ├── hash_calculator.py
+        ├── size_calculator.py
+        └── validators.py
 ```
 
 ## 🔥 **Module Specializate**
@@ -223,7 +230,7 @@ ultra-turbo-appdata-cleaner/
 
 ## 📊 **Exemple de Utilizare**
 
-### **Web Interface - Quick Actions:**
+### **Web Interface - Quick Start:**
 ```bash
 # Start web server
 cd web && python app.py
@@ -240,16 +247,14 @@ curl -X POST http://localhost:5000/api/clean/temp \
   -d '{"max_age_days": 7, "create_backup": true}'
 ```
 
-### **CLI Examples:**
+### **Console Application:**
 ```bash
-# Scanare rapidă sistem
-python main.py --cli --scan
+# Rulare aplicație console
+python main.py
 
-# Curățare automată cu backup
-python main.py --cli --clean
-
-# Mod interactiv cu wizard
-python main.py --cli
+# Sau cu parametri
+python main.py --scan-type quick
+python main.py --auto-clean
 ```
 
 ### **Python API Usage:**
@@ -271,7 +276,7 @@ print(f"Cleaned {results['files_deleted']} files")
 print(f"Freed {results['bytes_freed'] / (1024**2):.2f} MB")
 ```
 
-## 📊 **Performance & Statistici**
+## 📈 **Performance & Statistici**
 
 ### **Rezultate Tipice:**
 - **AppData cleaning:** 200-500MB eliberat
@@ -307,9 +312,9 @@ print(f"Freed {results['bytes_freed'] / (1024**2):.2f} MB")
 - **Manifest files** pentru tracking
 - **Easy restoration** prin web interface
 
-## 🖥️ **Screenshots Web Interface**
+## 🌐 **Web Interface Screenshots**
 
-### **Dashboard:**
+### **📊 Dashboard:**
 ```
 🏠 Ultra-Turbo AppData Cleaner Dashboard
 ├── 💾 System Overview
@@ -323,7 +328,7 @@ print(f"Freed {results['bytes_freed'] / (1024**2):.2f} MB")
 └── ⚡ Quick Actions: [Scan] [Clean] [Settings]
 ```
 
-### **Cleaner Panel:**
+### **🎛️ Cleaner Panel:**
 ```
 🎯 Cleaning Control Panel
 ├── 🔍 Scan Options
@@ -377,17 +382,15 @@ def custom_operation():
 ### **Core:**
 - `psutil` - System monitoring
 - `pathlib` - Path operations
-- `asyncio` - Async processing
+- Standard Python libraries
 
 ### **Web Interface:**
-- `Flask` - Web framework
-- `Flask-SocketIO` - WebSocket support
-- `Bootstrap 5` - UI framework
-- `Chart.js` - Interactive charts
-
-### **GUI Interface:**
-- `tkinter` - Desktop GUI (built-in Python)
-- `ttk` - Modern widgets
+- `Flask==2.3.3` - Web framework
+- `Flask-SocketIO==5.3.6` - WebSocket support
+- `psutil==5.9.5` - System monitoring
+- `requests==2.31.0` - HTTP requests
+- `Bootstrap 5` - UI framework (CDN)
+- `Chart.js` - Interactive charts (CDN)
 
 ## 📝 **Changelog**
 
@@ -400,6 +403,8 @@ def custom_operation():
 - 🌍 Multi-browser support
 - 🔍 Duplicate detection cu hashing
 - ⚡ WebSocket pentru live updates
+- 📱 Mobile responsive design
+- 🎨 Dark/Light theme support
 
 ## 👤 **Author**
 
@@ -408,7 +413,7 @@ def custom_operation():
 - Location: București, România
 - Expertise: MultiversX blockchain, Python automation, Web development
 
-## 📜 **License**
+## 📄 **License**
 
 MIT License - see [LICENSE](LICENSE) file
 
@@ -416,22 +421,32 @@ MIT License - see [LICENSE](LICENSE) file
 
 1. **Web Interface** (recomandat pentru începători):
    ```bash
-   cd web && python app.py
-   # http://localhost:5000
+   git clone https://github.com/Gzeu/ultra-turbo-appdata-cleaner.git
+   cd ultra-turbo-appdata-cleaner/web
+   pip install -r requirements.txt
+   python app.py
+   # Access: http://localhost:5000
    ```
 
-2. **CLI pentru power users**:
+2. **Console Application**:
    ```bash
-   python main.py --cli
-   ```
-
-3. **GUI pentru desktop**:
-   ```bash
+   cd ultra-turbo-appdata-cleaner
    python main.py
    ```
 
-**🎥 Demo Video și documentatie detaliată disponibile pe [Wiki](../../wiki)**
+## 🎯 **Project Status**
+
+- ✅ **Core Engine** - Fully implemented
+- ✅ **Web Interface** - Complete with all features
+- ✅ **API REST** - All endpoints functional
+- ✅ **Safety System** - 5-level protection
+- ✅ **Backup System** - Automatic ZIP backups
+- ✅ **Real-time Updates** - WebSocket implementation
+- ✅ **Mobile Support** - Responsive design
+- ✅ **Documentation** - Complete README
 
 ---
 
 **⚡ Ultra-Turbo AppData Cleaner** - Curățarea sistemului făcută simplu, sigur și eficient! 🎆
+
+**🌟 Star the repo if you find it useful!**
