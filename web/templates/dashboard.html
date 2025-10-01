@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Ultra-Turbo AppData Cleaner{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="bi bi-speedometer2"></i>
+            System Dashboard
+            <small class="text-muted fs-6">Real-time system monitoring</small>
+        </h1>
+    </div>
+</div>
+
+<!-- System Overview Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">Memory Usage</h4>
+                        <h2 id="memory-percentage">{{ system_info.memory.percentage }}%</h2>
+                        <small>{{ system_info.memory.used_gb }}GB / {{ system_info.memory.total_gb }}GB</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-memory fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">Disk Usage</h4>
+                        <h2 id="disk-percentage">{{ system_info.disk.percentage }}%</h2>
+                        <small>{{ system_info.disk.used_gb }}GB / {{ system_info.disk.total_gb }}GB</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-hdd fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">CPU Usage</h4>
+                        <h2 id="cpu-percentage">{{ system_info.cpu.percentage }}%</h2>
+                        <small>{{ system_info.cpu.count }} cores</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-cpu fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">Uptime</h4>
+                        <h2 id="system-uptime">{{ system_info.system.uptime_hours }}h</h2>
+                        <small>Since last boot</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-clock fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-lg-8 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bar-chart"></i>
+                    Storage Analysis
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="storageChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-pie-chart"></i>
+                    Cleanup Potential
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="cleanupChart" height="300"></canvas>
+                <div class="mt-3 text-center">
+                    <button class="btn btn-outline-primary" onclick="estimateCleanup()">
+                        <i class="bi bi-calculator"></i> Estimate Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightning"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-primary w-100" onclick="quickScan()">
+                            <i class="bi bi-search"></i>
+                            Quick Scan
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-success w-100" onclick="quickClean()">
+                            <i class="bi bi-brush"></i>
+                            Quick Clean
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-info w-100" onclick="fullScan()">
+                            <i class="bi bi-binoculars"></i>
+                            Full Scan
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-warning w-100" onclick="showSettings()">
+                            <i class="bi bi-gear"></i>
+                            Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Activity Feed -->
+<div class="row">
+    <div class="col-lg-8 mb-3">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-activity"></i>
+                    Recent Activity
+                </h5>
+                <button class="btn btn-outline-secondary btn-sm" onclick="clearActivity()">
+                    <i class="bi bi-trash"></i> Clear
+                </button>
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                <div id="activity-feed">
+                    <div class="text-muted text-center py-3">
+                        <i class="bi bi-clock-history fs-1 mb-2 d-block"></i>
+                        No recent activity
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-folder2"></i>
+                    AppData Status
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="appdata-status">
+                    {% for name, info in system_info.appdata_paths.items() %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold">{{ name.title() }}:</span>
+                        <span class="badge {% if info.accessible %}bg-success{% else %}bg-danger{% endif %}">
+                            {% if info.accessible %}Accessible{% else %}Blocked{% endif %}
+                        </span>
+                    </div>
+                    {% if info.accessible %}
+                    <div class="small text-muted mb-3">
+                        {{ info.file_count }} files, {{ info.size_mb }}MB
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                
+                <div class="mt-3">
+                    <button class="btn btn-outline-primary w-100" onclick="scanAppData()">
+                        <i class="bi bi-search"></i> Scan AppData
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeDashboard();
+        setupSystemMonitoring();
+    });
+</script>
+{% endblock %}

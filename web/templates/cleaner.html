@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Cleaner - Ultra-Turbo AppData Cleaner{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="bi bi-brush"></i>
+            System Cleaner
+            <small class="text-muted fs-6">Select and clean system files</small>
+        </h1>
+    </div>
+</div>
+
+<!-- Scan Controls -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-search"></i>
+                    Scan Options
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="scan-type" class="form-label">Scan Type</label>
+                            <select class="form-select" id="scan-type">
+                                <option value="quick">Quick Scan (Temp files only)</option>
+                                <option value="full">Full System Scan</option>
+                                <option value="appdata">AppData Only</option>
+                                <option value="temp">Temp Files Only</option>
+                                <option value="duplicates">Duplicate Files</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="max-age" class="form-label">Max File Age (days)</label>
+                            <input type="number" class="form-control" id="max-age" value="30" min="1" max="365">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="custom-paths" class="form-label">Custom Scan Paths (one per line)</label>
+                    <textarea class="form-control" id="custom-paths" rows="3" 
+                              placeholder="C:\\Users\\Username\\Downloads&#10;C:\\Temp&#10;D:\\OldFiles"></textarea>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" onclick="startScan()">
+                        <i class="bi bi-play-circle"></i> Start Scan
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="loadLastResults()">
+                        <i class="bi bi-clock-history"></i> Load Last Results
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scan Results -->
+<div class="row mb-4" id="scan-results-section" style="display: none;">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-check"></i>
+                    Scan Results
+                </h5>
+                <div>
+                    <button class="btn btn-outline-success btn-sm me-2" onclick="selectAllCleanable()">
+                        <i class="bi bi-check-all"></i> Select All Safe
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="clearSelection()">
+                        <i class="bi bi-x-circle"></i> Clear Selection
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Results Summary -->
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 id="total-files" class="text-primary">0</h4>
+                            <small class="text-muted">Total Files</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 id="cleanable-files" class="text-success">0</h4>
+                            <small class="text-muted">Safe to Clean</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 id="potential-savings" class="text-info">0 MB</h4>
+                            <small class="text-muted">Potential Savings</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 id="selected-count" class="text-warning">0</h4>
+                            <small class="text-muted">Selected</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filters -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="category-filter" class="form-label">Filter by Category</label>
+                        <select class="form-select" id="category-filter" onchange="filterResults()">
+                            <option value="all">All Categories</option>
+                            <option value="temp">Temporary Files</option>
+                            <option value="cache">Cache Files</option>
+                            <option value="log">Log Files</option>
+                            <option value="backup">Backup Files</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="safety-filter" class="form-label">Filter by Safety</label>
+                        <select class="form-select" id="safety-filter" onchange="filterResults()">
+                            <option value="all">All Safety Levels</option>
+                            <option value="1">Very Safe</option>
+                            <option value="2">Safe</option>
+                            <option value="3">Moderate</option>
+                            <option value="4">Risky</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="search-filter" class="form-label">Search Files</label>
+                        <input type="text" class="form-control" id="search-filter" 
+                               placeholder="Search by filename..." onkeyup="filterResults()">
+                    </div>
+                </div>
+                
+                <!-- File List -->
+                <div class="table-responsive" style="max-height: 500px;">
+                    <table class="table table-hover">
+                        <thead class="sticky-top">
+                            <tr>
+                                <th width="40">
+                                    <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll()">
+                                </th>
+                                <th>File Name</th>
+                                <th width="100">Size</th>
+                                <th width="120">Category</th>
+                                <th width="100">Safety</th>
+                                <th width="100">Age</th>
+                                <th>Path</th>
+                            </tr>
+                        </thead>
+                        <tbody id="files-table-body">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="bi bi-search fs-1 mb-2 d-block"></i>
+                                    No scan results available. Start a scan to see files.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cleaning Controls -->
+<div class="row mb-4" id="cleaning-controls-section" style="display: none;">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-trash"></i>
+                    Cleaning Options
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="create-backup" checked>
+                            <label class="form-check-label" for="create-backup">
+                                Create backup before cleaning (recommended)
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="show-confirmation" checked>
+                            <label class="form-check-label" for="show-confirmation">
+                                Show confirmation dialog
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="safe-mode" checked>
+                            <label class="form-check-label" for="safe-mode">
+                                Safe mode (only very safe files)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="mb-2">
+                            <strong>Selected Files:</strong>
+                            <span id="selected-files-count" class="text-primary">0</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Est. Space Freed:</strong>
+                            <span id="selected-size" class="text-success">0 MB</span>
+                        </div>
+                        
+                        <button class="btn btn-danger" id="start-cleaning-btn" 
+                                onclick="startCleaning()" disabled>
+                            <i class="bi bi-trash"></i>
+                            Start Cleaning
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/cleaner.js') }}"></script>
+<script>
+    // Initialize cleaner page
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCleaner();
+        
+        // Load last scan results if available
+        {% if scan_results %}
+        displayScanResults({{ scan_results|tojson }});
+        {% endif %}
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ultra-Turbo AppData Cleaner{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body data-bs-theme="dark">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+                <i class="bi bi-rocket-takeoff"></i>
+                Ultra-Turbo AppData Cleaner
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" 
+                           href="{{ url_for('dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'cleaner' %}active{% endif %}" 
+                           href="{{ url_for('cleaner') }}">
+                            <i class="bi bi-brush"></i> Cleaner
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'settings_page' %}active{% endif %}" 
+                           href="{{ url_for('settings_page') }}">
+                            <i class="bi bi-gear"></i> Settings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'logs' %}active{% endif %}" 
+                           href="{{ url_for('logs') }}">
+                            <i class="bi bi-journal-text"></i> Logs
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Connection Status -->
+                <div class="navbar-nav">
+                    <div class="nav-item">
+                        <span class="nav-link" id="connection-status">
+                            <i class="bi bi-circle-fill text-danger"></i>
+                            <span id="connection-text">Connecting...</span>
+                        </span>
+                    </div>
+                    
+                    <!-- Theme Toggle -->
+                    <div class="nav-item">
+                        <button class="btn btn-outline-secondary btn-sm" id="theme-toggle">
+                            <i class="bi bi-sun"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="container-fluid main-content">
+        <!-- Notifications Area -->
+        <div id="notifications-area"></div>
+        
+        <!-- Page Content -->
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+    <!-- Progress Modal -->
+    <div class="modal fade" id="progressModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="progressModalTitle">Operation in Progress</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span id="progress-operation-name">Loading...</span>
+                            <span id="progress-percentage">0%</span>
+                        </div>
+                        <div class="progress mb-3">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" id="progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">Current Item:</small>
+                            <div id="progress-current-item" class="fw-bold">-</div>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">Status:</small>
+                            <div id="progress-status-message" class="fw-bold">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <small class="text-muted">Processed:</small>
+                            <div id="progress-items-processed" class="fw-bold">0</div>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">Failed:</small>
+                            <div id="progress-items-failed" class="text-danger fw-bold">0</div>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">Elapsed:</small>
+                            <div id="progress-elapsed-time" class="fw-bold">0s</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="progress-close-btn" disabled>
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/websocket.js') }}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
