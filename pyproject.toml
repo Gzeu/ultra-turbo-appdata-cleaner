@@ -1,0 +1,151 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ultra-turbo-appdata-cleaner"
+version = "1.0.0"
+description = "Advanced Python application for cleaning and optimizing Windows systems"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    {name = "Pricop George", email = "pricopgeorge@gmail.com"}
+]
+license = {file = "LICENSE"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities"
+]
+keywords = ["windows", "cleaner", "appdata", "temp-files", "system-optimization", "flask", "web-interface"]
+
+dependencies = [
+    "psutil>=5.9.0",
+    "pathlib2>=2.3.0; python_version<'3.9'"
+]
+
+[project.optional-dependencies]
+web = [
+    "Flask>=2.3.0",
+    "Flask-SocketIO>=5.3.0",
+    "requests>=2.31.0"
+]
+gui = [
+    # tkinter is built-in for Python 3.x
+]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0"
+]
+test = [
+    "pytest>=7.4.2",
+    "pytest-asyncio>=0.21.1",
+    "pytest-cov>=4.1.0",
+    "pytest-flask>=1.2.0",
+    "playwright>=1.39.0",
+    "pytest-playwright>=0.4.3"
+]
+
+[project.urls]
+Homepage = "https://github.com/Gzeu/ultra-turbo-appdata-cleaner"
+"Bug Reports" = "https://github.com/Gzeu/ultra-turbo-appdata-cleaner/issues"
+"Source Code" = "https://github.com/Gzeu/ultra-turbo-appdata-cleaner"
+Documentation = "https://github.com/Gzeu/ultra-turbo-appdata-cleaner#readme"
+
+[project.scripts]
+ultra-turbo-cleaner = "main:main"
+utac = "main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]  # Root directory
+include = ["core*", "modules*", "utils*", "config*", "web*", "gui*", "cli*"]
+
+[tool.setuptools.package-data]
+"web" = ["templates/*.html", "static/css/*.css", "static/js/*.js"]
+"config" = ["*.json", "*.yaml"]
+
+[tool.black]
+line-length = 100
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+(
+  /(
+      \.eggs
+    | \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+)
+'''
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m "not slow"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "e2e: marks tests as end-to-end tests"
+]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.coverage.run]
+source = ["."] 
+omit = [
+    "tests/*",
+    "setup.py",
+    "*/migrations/*",
+    "*/venv/*",
+    "*/virtualenv/*",
+    "*/.tox/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:"
+]
