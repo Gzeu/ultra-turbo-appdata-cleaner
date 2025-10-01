@@ -1,0 +1,25 @@
+# Flask web framework
+Flask==2.3.3
+Flask-SocketIO==5.3.6
+
+# WebSocket support
+python-socketio==5.8.0
+python-engineio==4.7.1
+
+# HTTP and networking
+requests==2.31.0
+
+# System monitoring
+psutil==5.9.5
+
+# Security
+Werkzeug==2.3.7
+
+# Development tools (optional)
+flask-debugtoolbar==0.13.1
+
+# Production server (optional)
+gunicorn==21.2.0
+
+# Additional utilities
+python-dotenv==1.0.0
