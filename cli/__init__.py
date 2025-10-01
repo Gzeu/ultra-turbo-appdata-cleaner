@@ -1,5 +1,5 @@
 """
-Utilities package for Ultra-Turbo AppData Cleaner
+CLI package for Ultra-Turbo AppData Cleaner
 """
 
 __version__ = "1.0.0"
